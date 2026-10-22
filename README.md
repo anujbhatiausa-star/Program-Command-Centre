@@ -14,13 +14,12 @@ A program management dashboard for a Salesforce delivery program billed by **acc
 
 You need Node.js 20+ and a free Supabase account.
 
-1. **Create a new Supabase project** at <https://supabase.com/dashboard>. Use a new, dedicated project; never reuse another project's database or keys.
-2. **Copy the keys.** In Supabase: Project Settings → API. Then:
+1. **Supabase project:** already created for this demo (`vchxyhuympntomrqkudc`). Its URL and anon key are committed in `.env`; they are public by design, and RLS protects the data.
+2. **Add the service-role key** (not committed, because this repo is public). In Supabase: Project Settings → API Keys → `service_role`. Then:
    ```bash
-   cp .env.example .env.local
+   echo "SUPABASE_SERVICE_ROLE_KEY=paste-key-here" > .env.local
    ```
-   Fill in `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY`. `.env.local` is git-ignored; never commit it.
-3. **Create the schema.** In Supabase: SQL Editor → New query. Paste all of `supabase/migrations/001_schema.sql` and click **Run**. This creates the tables, indexes, row-level security policies and workflow triggers, and adds `stories` to Realtime.
+3. **Create the schema** (once). In Supabase: SQL Editor → New query. Paste all of `supabase/migrations/001_schema.sql` and click **Run**. This creates the tables, indexes, row-level security policies and workflow triggers, and adds `stories` to Realtime.
 4. **Install, seed and create the demo users**, in this order:
    ```bash
    npm install
@@ -45,8 +44,8 @@ You need Node.js 20+ and a free Supabase account.
 ### Optional: deploy to Vercel
 
 1. Push this folder to its own GitHub repo, then on <https://vercel.com/new> import it (framework preset: Next.js).
-2. Add the same three environment variables from `.env.local` in Vercel → Settings → Environment Variables.
-3. Deploy. No Supabase URL settings are needed, because sign-in is email and password.
+2. In Vercel → Settings → Environment Variables, add `SUPABASE_SERVICE_ROLE_KEY`.
+3. Deploy. Vercel reads the URL and anon key from the committed `.env`; add only `SUPABASE_SERVICE_ROLE_KEY` (needed for **Reset demo data**). No Supabase URL settings are needed, because sign-in is email and password.
 
 ---
 
@@ -127,5 +126,5 @@ scripts/              seed.mjs, create-demo-users.mjs
 
 - **The "Live" dot stays grey.** Check that the migration's last statement ran: Database → Publications → `supabase_realtime` should include `stories`.
 - **"Invalid login credentials".** Run `node scripts/create-demo-users.mjs` again.
-- **Login page says Supabase is not configured.** Fill in `.env.local`, then restart `npm run dev`.
+- **Scripts say the service-role key is missing.** Create `.env.local` as in step 2.
 - **Want the data back to its starting state?** Sign in as PM → **Reset demo data**, or run `node scripts/seed.mjs`.
